@@ -16,19 +16,14 @@ This is the Cancer Genomics Research Laboratory's (CGR) microbiome analysis pipe
   #SampleID Run-ID  Project-ID
   ```
   - See the template manifest files in this repo for examples
+  - Note that including additional information in the manifest file will help to generate a more informative report.  Please see the QC report section below for more details.
 - config.yaml
-- (for production runs) run_pipeline.sh
+- run_pipeline.sh
 
 
-### Options to run the pipeline (choose one)
+### To run the pipeline
 
-A. Production run: Copy `run_pipeline.sh` and `config.yaml` to your directory, edit as needed, then execute the script.
-B. For dev/testing only: Copy and edit `config.yaml`, then run the snakefile directly, e.g.:
-```
-module load perl/5.18.0 python3/3.6.3 miniconda/3 jdk/15 bbmap
-source activate qiime2-2019.1
-conf=${PWD}/config.yml snakemake -s /path/to/pipeline/Snakefile
-```
+Copy `run_pipeline.sh` and `config.yaml` to your directory, edit as needed, then execute the script.
 
 ## Configuration details
 
@@ -61,51 +56,57 @@ conf=${PWD}/config.yml snakemake -s /path/to/pipeline/Snakefile
 
 ## Example output directory structure
 
-- Within parent directory `<out_dir>/` defined in config.yaml
-TODO: Needs updating!
+- Approximate example tree of parent directory `<out_dir>/` defined in config.yaml
 ```
 .
-├── config_mock-20.yml
+├── bacteria_only
+│   ├── feature_tables
+│   └── sequence_tables
+├── config.yml
 ├── denoising
 │   ├── feature_tables
-│   │   ├── merged_filtered.qza
-│   │   ├── merged_filtered.qzv
-│   │   ├── merged.qza
-│   │   └── mock_runID_2020.qza
 │   ├── sequence_tables
-│   │   ├── merged.qza
-│   │   ├── merged.qzv
-│   │   └── mock_runID_2020.qza
 │   └── stats
-│       ├── mock_runID_2020.qza
-│       └── mock_runID_2020.qzv
 ├── diversity_core_metrics
+│   ├── gg-13-8-99-515-806-nb-classifier
+│   └── silva-132-99-515-806-nb-classifier
 ├── fastqs
-│   ├── mock-20_R1.fastq.gz -> /path/to/originals/mock-20/mock-forward-read.fastq.gz
-│   └── mock-20_R2.fastq.gz -> /path/to/originals/mock-20/mock-reverse-read.fastq.gz
+│   ├── NTC-PB96595-H-12_R1.fastq.gz -> /DCEG_Archive/CGR/Sequencing/Illumina/MiSeq/PostRun_Analysis/Data/170629_M03599_0095_000000000-B5HGD/CASAVA/L1/Project_NP0453-MB2/Sample_NTC-PB96595-H-12/NTC-PB96595-H-12_GCTCGAAGATCG_L001_R1_001.fastq.gz
+│   ├── NTC-PB96595-H-12_R1_paired.fastq.gz
+│   ├── NTC-PB96595-H-12_R2.fastq.gz -> /DCEG_Archive/CGR/Sequencing/Illumina/MiSeq/PostRun_Analysis/Data/170629_M03599_0095_000000000-B5HGD/CASAVA/L1/Project_NP0453-MB2/Sample_NTC-PB96595-H-12/NTC-PB96595-H-12_GCTCGAAGATCG_L001_R2_001.fastq.gz
+│   ├── NTC-PB96595-H-12_R2_paired.fastq.gz
+│   ├── NTC-PB96595-H-12_singletons.fastq.gz
 ├── import_and_demultiplex
-│   ├── mock_runID_2020.qza
-│   └── mock_runID_2020.qzv
+│   ├── 170629_M03599_0095_000000000-B5HGD.qza
+│   ├── 170629_M03599_0095_000000000-B5HGD.qzv
+│   ├── 170719_M01354_0073_000000000-B62F4.qza
 ├── logs
-│   ├── Q2_202002061005.out
-│   └── ...
+│   ├── Q2_202010210116.out
+│   ├── snakejob.alpha_beta_diversity.1197.sh.o1730899
+│   ├── snakejob.alpha_beta_diversity.1197.sh.po1730899
 ├── manifests
-│   ├── manifest_qiime2.tsv
-│   └── mock_runID_2020_Q2_manifest.txt
-├── manifest.txt
+│   ├── 170629_M03599_0095_000000000-B5HGD_Q2_manifest.txt
+│   ├── 170719_M01354_0073_000000000-B62F4_Q2_manifest.txt
+│   └── manifest_qiime2.tsv
+├── NP0453_MB3_NP0453_MB2_and_3_manifest.txt
 ├── phylogenetics
 │   ├── masked_msa.qza
 │   ├── msa.qza
 │   ├── rooted_tree.qza
 │   └── unrooted_tree.qza
-├── Q2_wrapper.sh.o3040063
+├── Q2_wrapper.sh.o1723896
+├── read_feature_and_sample_filtering
+│   ├── feature_tables
+│   └── sequence_tables
 ├── run_pipeline.sh
 ├── run_times
-└── taxonomic_classification
-    ├── barplots_classify-sklearn_gg-13-8-99-nb-classifier.qzv
-    ├── classify-sklearn_gg-13-8-99-nb-classifier.qza
-    ├── classify-sklearn_gg-13-8-99-nb-classifier.qzv
-    └── classify-sklearn_silva-132-99-nb-classifier.qza
+├── taxonomic_classification
+│   ├── gg-13-8-99-515-806-nb-classifier
+│   └── silva-132-99-515-806-nb-classifier
+├── taxonomic_classification_bacteria_only
+│   ├── gg-13-8-99-515-806-nb-classifier
+│   └── silva-132-99-515-806-nb-classifier
+└── NP0453_MB2_and_3_20200613_initial_run_QC_report.html
 ```
 
 ## QC report

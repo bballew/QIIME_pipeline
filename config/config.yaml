@@ -32,15 +32,15 @@ dada2_denoise:
 phred_score: 33
 demux_param: 'paired_end_demux'
 input_type: 'SampleData[PairedEndSequencesWithQuality]'
-min_num_features_per_sample: 1  # TODO: enforce a minimum of 1 
+min_num_features_per_sample: 1 
 min_num_reads_per_sample: 1
 min_num_reads_per_feature: 1
 min_num_samples_per_feature: 1
 sampling_depth: 10000
 max_depth: 54000
 reference_db:  # change based on qiime version
-- '/path/to/refDatabases/eg/scikit_0.20.2_q2_2019.1/gg-13-8-99-515-806-nb-classifier.qza'
-- '/path/to/refDatabases/eg/scikit_0.20.2_q2_2019.1/silva-132-99-515-806-nb-classifier.qza'
+- '/path/to/refDatabases/scikit_0.20.2_q2_2019.1/gg-13-8-99-515-806-nb-classifier.qza'
+- '/path/to/refDatabases/scikit_0.20.2_q2_2019.1/silva-132-99-515-806-nb-classifier.qza'
 
 ## Cluster submission parameters
 cluster_mode: 'qsub ...'  # options are 'qsub/sbatch/etc ...', 'local', 'dryrun', 'unlock'
