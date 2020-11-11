@@ -1,0 +1,8 @@
+name: check_manifest
+channels:
+  - bioconda
+  - defaults
+  - conda-forge
+dependencies:
+  - perl
+  - dos2unix

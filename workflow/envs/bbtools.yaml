@@ -1,0 +1,8 @@
+name: bbtoools
+channels:
+  - bioconda
+  - defaults
+  - conda-forge
+dependencies:
+  - bbmap=38.87
+  - java-jdk=8.0.112
