@@ -556,7 +556,9 @@ rule merge_feature_tables:
     NOTE: limited scalability due to cli character limit.
     """
     input:
-        feature_tables=expand("results/denoising/feature_tables/{runID}.qza", runID=RUN_IDS),
+        feature_tables="--i-tables " + " --i-tables ".join(
+            expand("results/denoising/feature_tables/{runID}.qza", runID=RUN_IDS)
+        ),
         q2_manifest="results/manifests/manifest_qiime2.tsv",
     output:
         "results/denoising/feature_tables/merged.qza",
@@ -564,12 +566,8 @@ rule merge_feature_tables:
         "results/run_times/merge_feature_tables/merge_feature_tables.tsv"
     conda:
         "envs/qiime2-2019-1.yaml"
-    run:
-        if len(RUN_IDS) == 1:
-            shell("cp {input.feature_tables} {output}")
-        else:
-            l = "--i-tables " + " --i-tables ".join(input.feature_tables)
-            shell("qiime feature-table merge " + l + " --o-merged-table {output}")
+    shell:
+        "qiime feature-table merge {input.feature_tables} --o-merged-table {output}"
 
 
 rule merge_sequence_tables:
@@ -580,7 +578,9 @@ rule merge_sequence_tables:
     NOTE: limited scalability due to cli character limit.
     """
     input:
-        seqs=expand("results/denoising/sequence_tables/{runID}.qza", runID=RUN_IDS),
+        seqs="--i-data " + " --i-data ".join(
+            expand("results/denoising/sequence_tables/{runID}.qza", runID=RUN_IDS)
+        ),
         q2_manifest="results/manifests/manifest_qiime2.tsv",
     output:
         "results/denoising/sequence_tables/merged.qza",
@@ -588,12 +588,8 @@ rule merge_sequence_tables:
         "results/run_times/merge_sequence_tables/merge_sequence_tables.tsv"
     conda:
         "envs/qiime2-2019-1.yaml"
-    run:
-        if len(RUN_IDS) == 1:
-            shell("cp {input.seqs} {output}")
-        else:
-            l = "--i-data " + " --i-data ".join(input.seqs)
-            shell("qiime feature-table merge-seqs " + l + " --o-merged-data {output}")
+    shell:
+        "qiime feature-table merge-seqs {input.seqs} --o-merged-data {output}"
 
 
 rule remove_samples_with_low_read_count:
