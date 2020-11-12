@@ -1,5 +1,5 @@
 # CGR QIIME2 pipeline for microbiome analysis.
-# 
+#
 # AUTHORS:
 #     S. Sevilla Chill
 #     W. Zhou
@@ -7,20 +7,14 @@
 #     Y. Wan
 
 ## Manifest
-metadata_manifest: 'config/manifest.txt'
+metadata_manifest: 'config/test_manifest.txt'
 
-## Directories
-out_dir: '/path/to/project/directory/'
-exec_dir: '/path/to/QIIME_pipeline/'
-fastq_abs_path: '/path/to/fastqs/'  # internal runs only
-temp_dir: '/path/to/scratch/'
+## Input directory (CGR-generated data only)
+fastq_abs_path: '/DCEG/CGF/Sequencing/Illumina/MiSeq/PostRun_Analysis/Data/'
+temp_dir: '/scratch/bb/16s_test/'
 
 ## Run type
 data_source: 'internal'  # 'external' or 'internal' (to CGR)
-  # for external data, require an additional metadata columns called "fq1" and "fq2" with full path and file names for R1 and R2 fastqs (do they need to be zipped?)
-
-## QIIME version
-qiime2_version: '2019.1'  # 2017.11 or 2019.1
 
 ## Analysis parameters
 dada2_denoise:
@@ -32,19 +26,19 @@ dada2_denoise:
 phred_score: 33
 demux_param: 'paired_end_demux'
 input_type: 'SampleData[PairedEndSequencesWithQuality]'
-min_num_features_per_sample: 1 
+min_num_features_per_sample: 1
 min_num_reads_per_sample: 1
 min_num_reads_per_feature: 1
 min_num_samples_per_feature: 1
 sampling_depth: 10000
 max_depth: 54000
 reference_db:  # change based on qiime version
-- '/path/to/refDatabases/scikit_0.20.2_q2_2019.1/gg-13-8-99-515-806-nb-classifier.qza'
-- '/path/to/refDatabases/scikit_0.20.2_q2_2019.1/silva-132-99-515-806-nb-classifier.qza'
+- '/DCEG/CGF/Bioinformatics/Production/Bari/refDatabases/scikit_0.20.2_q2_2019.1/gg-13-8-99-nb-classifier.qza'
+- '/DCEG/CGF/Bioinformatics/Production/Bari/refDatabases/scikit_0.20.2_q2_2019.1/silva-132-99-nb-classifier.qza'
 
 ## Cluster submission parameters
-cluster_mode: 'qsub ...'  # options are 'qsub/sbatch/etc ...', 'local', 'dryrun', 'unlock'
+cluster_mode: 'qsub -V -q seq-calling.q -cwd -j y -o results/logs/ -S /bin/bash -pe by_node {threads}'  # options are 'qsub/sbatch/etc ...', 'local', 'dryrun', 'unlock'
   # SGE example:    qsub -q myqueue.q -V -j y -S /bin/bash -o /path/to/project/directory/logs/ -pe by_node {threads}
   # slurm example:  sbatch --mem=64g --time=24:00:00 --output=/path/to/project/directory/logs/slurm-%j.out --cpus-per-task={threads}
-num_jobs: 10
+num_jobs: 100
 latency: 60
