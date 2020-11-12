@@ -61,4 +61,3 @@ This section is for developers of this pipeline.
    :name: dev_docs
 
    dev_docs/report
-

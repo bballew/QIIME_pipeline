@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # CGR QIIME2 pipeline for microbiome analysis.
-# 
+#
 # AUTHORS:
 #     B. Ballew
 
@@ -130,4 +130,3 @@ for i in "${MODES[@]}"; do
     grep -c "^PASS" "${obsPath}/diff_tests.txt" | tee -a "${PWD}/out_${stamp}_report"
     echo "" | tee -a "${PWD}/out_${stamp}_report"
 done
-

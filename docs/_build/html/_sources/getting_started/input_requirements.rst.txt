@@ -4,7 +4,7 @@ Input requirements
 * ``config.yaml``
 * ``run_pipeline.sh``
 * Manifest file
-  
+
   * For external (non-CGR-produced data) runs, the following columns are required:
   ::
 
@@ -14,7 +14,7 @@ Input requirements
   ::
 
     #SampleID Run-ID  Project-ID
-    
+
   * See the template manifest files in ``config/`` in this repo for examples
   * Note that including additional information in the manifest file will help to generate a more informative report.  Please see the QC report section below for more details.
 
@@ -26,4 +26,3 @@ Input requirements
   * Within that directory, create a directory for the initial run: ``YYYYMMDD_initial_run/``
   * Move the input requirements listed above to ``YYYYMMDD_initial_run/``
   * Execute ``run_pipeline.sh``
-  

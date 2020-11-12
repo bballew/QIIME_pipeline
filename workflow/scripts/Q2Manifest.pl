@@ -1,7 +1,7 @@
 #!/usr/bin/env perl -w
 
 # CGR QIIME2 pipeline for microbiome analysis.
-# 
+#
 # AUTHORS:
 #     S. Sevilla Chill
 #     W. Zhou
@@ -169,7 +169,7 @@ sub check_no_empty_fields {
 sub check_header_reqs {
     # returns true if string does not contain prohibited chars
     my ( $field ) = $_[0];
-    # QIIME documentation for 2017.11 states "cannot contain certain 
+    # QIIME documentation for 2017.11 states "cannot contain certain
     # special characters (e.g. /, \, *, ?, etc.)"
     # We don't know what "etc" includes, so just checking for the
     # explicitly listed chars.

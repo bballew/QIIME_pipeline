@@ -13,4 +13,3 @@ Workflow summary
 6. Merge feature and sequence tables across flow cells; drop samples with zero reads
 7. Build multiple sequence alignment, then build rooted and unrooted phylogenetic trees
 8. Perform alpha- and beta-diversity analysis, rarefaction, and taxonomic classification
-

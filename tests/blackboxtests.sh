@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # CGR QIIME2 pipeline for microbiome analysis.
-# 
+#
 # AUTHORS:
 #     B. Ballew
 
@@ -41,9 +41,9 @@ do
     echo "  truncate_length_reverse: 0" >> ${outPath}/TESTconfig.yml
     echo "  min_fold_parent_over_abundance: 2.0" >> ${outPath}/TESTconfig.yml
     echo "phred_score: 33" >> ${outPath}/TESTconfig.yml
-    echo "demux_param: 'paired_end_demux'" >> ${outPath}/TESTconfig.yml 
+    echo "demux_param: 'paired_end_demux'" >> ${outPath}/TESTconfig.yml
     echo "input_type: 'SampleData[PairedEndSequencesWithQuality]'" >> ${outPath}/TESTconfig.yml
-    echo "min_num_features_per_sample: 1" >> ${outPath}/TESTconfig.yml 
+    echo "min_num_features_per_sample: 1" >> ${outPath}/TESTconfig.yml
     echo "min_num_reads_per_sample: 1" >> ${outPath}/TESTconfig.yml
     echo "min_num_reads_per_feature: 1" >> ${outPath}/TESTconfig.yml
     echo "min_num_samples_per_feature: 1" >> ${outPath}/TESTconfig.yml

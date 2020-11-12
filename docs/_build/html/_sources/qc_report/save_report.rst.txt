@@ -6,7 +6,7 @@ To save the report
 
   https://github.com/ihuston/jupyter-hide-code-html
 
-* Run in terminal: 
+* Run in terminal:
 ::
 
   jupyter nbconvert --to html --template jupyter-hide-code-html/clean_output.tpl path/to/CGR_16S_Microbiome_QC_Report.ipynb

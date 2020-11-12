@@ -1,7 +1,7 @@
 #!/usr/bin/env perl -w
 
 # CGR QIIME2 pipeline for microbiome analysis.
-# 
+#
 # AUTHORS:
 #     S. Sevilla Chill
 #     W. Zhou

@@ -115,15 +115,15 @@ Copy `run_pipeline.sh` and `config.yaml` to your directory, edit as needed, then
 
 The manifest requirements for the report are the same as for the pipeline itself; however, including the following in your manifest will result in a more informative QC report:
 - To be detected as blanks, water blanks and no-template control sample IDs must contain the string "water" or "ntc" in the "#SampleID" column; this is not case sensitive.
-- "Source PCR Plate" column: header is case insensitive, can have spaces or not.  For the report, only the first characters preceding an underscore in this column will be preserved; this strips CGR's well ID from the string. 
-- "Sample Type" column: header is case insensitive, can have spaces or not.  Populate with any string values that define useful categories, e.g. water, NTC_control, blank, study sample, qc, etc. 
+- "Source PCR Plate" column: header is case insensitive, can have spaces or not.  For the report, only the first characters preceding an underscore in this column will be preserved; this strips CGR's well ID from the string.
+- "Sample Type" column: header is case insensitive, can have spaces or not.  Populate with any string values that define useful categories, e.g. water, NTC_control, blank, study sample, qc, etc.
 - "External ID" column: header is case insensitive, can have spaces or not.  This column is used at CGR to map IDs of received samples to the LIMS-generated IDs we use internally.  For technical replicates, the sample ID will be unique (as required by QIIME), but the external ID can be the same to link the samples for comparison in the report.
 - Note that the report assumes that the sequencer ID is the second underscore-delimited field in the run ID; this may not be meaningful if your run ID does not conform.
 
 
 ### Running the report
 
-For CGR production runs, after the pipeline completes, generate a QC report using the Jupyter notebook in the `report/` directory.  
+For CGR production runs, after the pipeline completes, generate a QC report using the Jupyter notebook in the `report/` directory.
 - Open the notebook (see below for details) and change the `proj_dir` variable in section 1.1
 - Run the complete notebook
 - Save the report as html with the code hidden (see below for details)
@@ -164,7 +164,7 @@ Jupyter notebooks are stored as JSON with metadata, which can result in very mes
 
 ------------------------------------------------------------------------------------
 
-## Notes 
+## Notes
 
 - Samples are run at a flowcell level, due to DADA2 run requirements. The algorithm that DADA2 uses includes an error model that assumes one sequencing run. The pitfall of merging them together prior to running DADA2 is that a lower-quality run (but still passing threshold) may have samples thrown out because they are significantly lower than a high performing run.
 - After creating the QIIME2 manifest file, www.keemi.qiime2.org can be used from Google Chrome to verify the manifest is in the correct format.

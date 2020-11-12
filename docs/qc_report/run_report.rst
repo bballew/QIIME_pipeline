@@ -1,7 +1,7 @@
 Running the report
 ==================
 
-For CGR production runs, after the pipeline completes, generate a QC report using the Jupyter notebook in the ``report/`` directory. 
+For CGR production runs, after the pipeline completes, generate a QC report using the Jupyter notebook in the ``report/`` directory.
 
 * Open the notebook (see below for details) and change the ``proj_dir`` variable in section 1.1
 * Run the complete notebook
