@@ -77,13 +77,13 @@ DATE=$(date +"%Y%m%d%H%M")
 
 cmd=""
 if [ "$cluster_mode" = '"'"local"'"' ]; then
-    cmd="conf=$config_file snakemake -p --rerun-incomplete --use-conda --conda-frontend mamba &> results/logs/Q2_${DATE}.out"
+    cmd="snakemake -p --rerun-incomplete --use-conda --conda-frontend mamba &> results/logs/Q2_${DATE}.out"
 elif [ "$cluster_mode" = '"'"unlock"'"' ]; then
-    cmd="conf=$config_file snakemake -p --unlock"  # convenience unlock
+    cmd="snakemake -p --unlock"  # convenience unlock
 elif [ "$cluster_mode" = '"'"dryrun"'"' ]; then
-    cmd="conf=$config_file snakemake -n -p"  # convenience dry run
+    cmd="snakemake -n -p"  # convenience dry run
 else
-    cmd="conf=$config_file snakemake -p --rerun-incomplete --use-conda --conda-frontend mamba --cluster ${cluster_mode} --jobs $num_jobs --latency-wait ${latency} &> results/logs/Q2_${DATE}.out"
+    cmd="snakemake -p --rerun-incomplete --use-conda --conda-frontend mamba --cluster ${cluster_mode} --jobs $num_jobs --latency-wait ${latency} &> results/logs/Q2_${DATE}.out"
 fi
 
 echo "Command run: $cmd"
