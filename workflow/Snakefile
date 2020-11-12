@@ -66,6 +66,7 @@ trunc_len_f = config["dada2_denoise"]["truncate_length_forward"]
 trunc_len_r = config["dada2_denoise"]["truncate_length_reverse"]
 min_fold = config["dada2_denoise"]["min_fold_parent_over_abundance"]
 
+myDir = os.getcwd()
 
 """Parse manifest to set up sample IDs and other info
 
@@ -388,11 +389,12 @@ rule create_per_sample_Q2_manifest:
         temp("results/manifests/{sample}_Q2_manifest_by_sample.txt"),
     params:
         runID=get_internal_runID if cgr_data else get_external_runID,
+        d=myDir + "/",
     benchmark:
         "results/run_times/create_per_sample_Q2_manifest/{sample}.tsv"
     shell:
-        'echo "{wildcards.sample},{input.fq1},forward,{params.runID}" > {output};'
-        'echo "{wildcards.sample},{input.fq2},reverse,{params.runID}" >> {output}'
+        'echo "{wildcards.sample},{params.d}{input.fq1},forward,{params.runID}" > {output};'
+        'echo "{wildcards.sample},{params.d}{input.fq2},reverse,{params.runID}" >> {output}'
 
 
 rule combine_Q2_per_sample_manifests:
@@ -442,17 +444,16 @@ rule import_fastq_and_demultiplex:
     params:
         in_type=input_type,
         phred=phred_score,
-        cmd_flag="input-format",
     benchmark:
         "results/run_times/import_fastq_and_demultiplex/{runID}.tsv"
     conda:
-        "envs/qiime2-2019-1.yaml"
+        "envs/q2_2019_1.yaml"
     shell:
         "qiime tools import "
         "--type {params.in_type} "
         "--input-path {input} "
         "--output-path {output} "
-        "--{params.cmd_flag} PairedEndFastqManifestPhred{params.phred}"
+        "--input-format PairedEndFastqManifestPhred{params.phred}"
 
 
 rule import_and_demultiplex_visualization:
@@ -470,7 +471,7 @@ rule import_and_demultiplex_visualization:
     benchmark:
         "results/run_times/import_and_demultiplex_visualization/{runID}.tsv"
     conda:
-        "envs/qiime2-2019-1.yaml"
+        "envs/q2_2019_1.yaml"
     shell:
         "qiime demux summarize "
         "--i-data {input} "
@@ -499,7 +500,7 @@ rule dada2_denoise:
     benchmark:
         "results/run_times/dada2_denoise/{runID}.tsv"
     conda:
-        "envs/qiime2-2019-1.yaml"
+        "envs/q2_2019_1.yaml"
     threads: 8
     shell:
         "qiime dada2 denoise-paired "
@@ -530,7 +531,7 @@ rule dada2_stats_visualization:
     benchmark:
         "results/run_times/dada2_stats_visualization/{runID}.tsv"
     conda:
-        "envs/qiime2-2019-1.yaml"
+        "envs/q2_2019_1.yaml"
     shell:
         "qiime metadata tabulate "
         "--m-input-file {input} "
@@ -556,18 +557,17 @@ rule merge_feature_tables:
     NOTE: limited scalability due to cli character limit.
     """
     input:
-        feature_tables="--i-tables " + " --i-tables ".join(
-            expand("results/denoising/feature_tables/{runID}.qza", runID=RUN_IDS)
-        ),
+        feature_tables=expand("results/denoising/feature_tables/{runID}.qza", runID=RUN_IDS),
         q2_manifest="results/manifests/manifest_qiime2.tsv",
     output:
         "results/denoising/feature_tables/merged.qza",
     benchmark:
         "results/run_times/merge_feature_tables/merge_feature_tables.tsv"
     conda:
-        "envs/qiime2-2019-1.yaml"
+        "envs/q2_2019_1.yaml"
     shell:
-        "qiime feature-table merge {input.feature_tables} --o-merged-table {output}"
+        "l=$(echo {input.feature_tables} | sed 's/ / --i-tables /g' | sed 's/^/--i-tables /');"
+        "qiime feature-table merge $l --o-merged-table {output}"
 
 
 rule merge_sequence_tables:
@@ -578,18 +578,17 @@ rule merge_sequence_tables:
     NOTE: limited scalability due to cli character limit.
     """
     input:
-        seqs="--i-data " + " --i-data ".join(
-            expand("results/denoising/sequence_tables/{runID}.qza", runID=RUN_IDS)
-        ),
+        seqs=expand("results/denoising/sequence_tables/{runID}.qza", runID=RUN_IDS),
         q2_manifest="results/manifests/manifest_qiime2.tsv",
     output:
         "results/denoising/sequence_tables/merged.qza",
     benchmark:
         "results/run_times/merge_sequence_tables/merge_sequence_tables.tsv"
     conda:
-        "envs/qiime2-2019-1.yaml"
+        "envs/q2_2019_1.yaml"
     shell:
-        "qiime feature-table merge-seqs {input.seqs} --o-merged-data {output}"
+        "l=$(echo {input.seqs} | sed 's/ / --i-data /g' | sed 's/^/--i-data /');"
+        "qiime feature-table merge-seqs $l --o-merged-data {output}"
 
 
 rule remove_samples_with_low_read_count:
@@ -607,7 +606,7 @@ rule remove_samples_with_low_read_count:
     benchmark:
         "results/run_times/remove_samples_with_low_read_count/remove_samples_with_low_read_count.tsv"
     conda:
-        "envs/qiime2-2019-1.yaml"
+        "envs/q2_2019_1.yaml"
     shell:
         "qiime feature-table filter-samples "
         "--i-table {input} "
@@ -627,7 +626,7 @@ rule remove_features_with_low_read_count:
     benchmark:
         "results/run_times/remove_features_with_low_read_count/remove_features_with_low_read_count.tsv"
     conda:
-        "envs/qiime2-2019-1.yaml"
+        "envs/q2_2019_1.yaml"
     shell:
         "qiime feature-table filter-features "
         "--i-table {input} "
@@ -647,7 +646,7 @@ rule remove_features_with_low_sample_count:
     benchmark:
         "results/run_times/remove_features_with_low_sample_count/remove_features_with_low_sample_count.tsv"
     conda:
-        "envs/qiime2-2019-1.yaml"
+        "envs/q2_2019_1.yaml"
     shell:
         "qiime feature-table filter-features "
         "--i-table {input} "
@@ -670,7 +669,7 @@ rule remove_samples_with_low_feature_count:
     benchmark:
         "results/run_times/remove_samples_with_low_feature_count/remove_samples_with_low_feature_count.tsv"
     conda:
-        "envs/qiime2-2019-1.yaml"
+        "envs/q2_2019_1.yaml"
     shell:
         "qiime feature-table filter-samples "
         "--i-table {input} "
@@ -698,7 +697,7 @@ rule filtered_feature_table_visualization:
     benchmark:
         "results/run_times/filtered_feature_table_visualization/feature_table_visualization.tsv"
     conda:
-        "envs/qiime2-2019-1.yaml"
+        "envs/q2_2019_1.yaml"
     shell:
         "qiime feature-table summarize "
         "--i-table {input.qza1} "
@@ -733,7 +732,7 @@ rule apply_filters_to_sequence_tables:
     benchmark:
         "results/run_times/apply_filters_to_sequence_tables/apply_filters_to_sequence_tables.tsv"
     conda:
-        "envs/qiime2-2019-1.yaml"
+        "envs/q2_2019_1.yaml"
     shell:
         "qiime feature-table filter-seqs --i-data {input.seq_table} --i-table {input.feat1} --o-filtered-data {output.seq1} && "
         "qiime feature-table filter-seqs --i-data {input.seq_table} --i-table {input.feat2} --o-filtered-data {output.seq2} && "
@@ -759,7 +758,7 @@ rule filtered_sequence_table_visualization:
     benchmark:
         "results/run_times/sequence_table_visualization/filtered_sequence_table_visualization.tsv"
     conda:
-        "envs/qiime2-2019-1.yaml"
+        "envs/q2_2019_1.yaml"
     shell:
         "qiime feature-table tabulate-seqs "
         "--i-data {input.qza1} "
@@ -783,7 +782,7 @@ rule sequence_table_visualization:
     benchmark:
         "results/run_times/sequence_table_visualization/sequence_table_visualization.tsv"
     conda:
-        "envs/qiime2-2019-1.yaml"
+        "envs/q2_2019_1.yaml"
     shell:
         "qiime feature-table tabulate-seqs "
         "--i-data {input} "
@@ -799,7 +798,7 @@ rule feature_table_visualization:
     benchmark:
         "results/run_times/feature_table_visualization/sequence_table_visualization.tsv"
     conda:
-        "envs/qiime2-2019-1.yaml"
+        "envs/q2_2019_1.yaml"
     shell:
         "qiime feature-table summarize "
         "--i-table {input.qza} "
@@ -839,7 +838,7 @@ rule taxonomic_classification:
     benchmark:
         "results/run_times/taxonomic_classification/{ref}.tsv"
     conda:
-        "envs/qiime2-2019-1.yaml"
+        "envs/q2_2019_1.yaml"
     threads: 8
     shell:
         "qiime feature-classifier {params.c_method} "
@@ -881,7 +880,7 @@ rule bacterial_taxonomic_classification:
     benchmark:
         "results/run_times/bacterial_taxonomic_classification/{ref}.tsv"
     conda:
-        "envs/qiime2-2019-1.yaml"
+        "envs/q2_2019_1.yaml"
     threads: 8
     shell:
         "qiime feature-classifier {params.c_method} "
@@ -903,7 +902,7 @@ rule fix_trailing_spaces:
     benchmark:
         "results/run_times/fix_trailing_spaces/{tax_dir}_{ref}.tsv"
     conda:
-        "envs/qiime2-2019-1.yaml"
+        "envs/q2_2019_1.yaml"
     shell:
         "qiime tools export --input-path {input} --output-path {params} && "
         "sed 's/ \t/\t/' {output.o1} > {output.o2} && "
@@ -925,7 +924,7 @@ rule taxonomic_class_visualization:
     benchmark:
         "results/run_times/taxonomic_class_visualization/{tax_dir}_{ref}.tsv"
     conda:
-        "envs/qiime2-2019-1.yaml"
+        "envs/q2_2019_1.yaml"
     shell:
         "qiime metadata tabulate "
         "--m-input-file {input} "
@@ -949,7 +948,7 @@ rule taxonomic_class_plots:
     benchmark:
         "results/run_times/taxonomic_class_plots/{ref}.tsv"
     conda:
-        "envs/qiime2-2019-1.yaml"
+        "envs/q2_2019_1.yaml"
     shell:
         "qiime taxa barplot "
         "--i-table {input.seqs} "
@@ -975,7 +974,7 @@ rule bacterial_taxonomic_class_plots:
     benchmark:
         "results/run_times/bacterial_taxonomic_class_plots/{ref}.tsv"
     conda:
-        "envs/qiime2-2019-1.yaml"
+        "envs/q2_2019_1.yaml"
     shell:
         "qiime taxa barplot "
         "--i-table {input.seqs} "
@@ -1002,7 +1001,7 @@ rule convert_taxonomy_to_tsv:
     params:
         d="results/{tax_dir}/{ref}/barplots_data_files",
     conda:
-        "envs/qiime2-2019-1.yaml"
+        "envs/q2_2019_1.yaml"
     shell:
         "qiime tools export --input-path {input.taxonomy_qza} --output-path {params.d}; "
         "qiime tools export --input-path {input.taxonomy_bar_plots} --output-path {params.d}"
@@ -1027,7 +1026,7 @@ rule remove_non_bacterial_taxa_feature_table_pt1:
     benchmark:
         "results/run_times/remove_non_bacterial_taxa_feature_table_pt1/{ref}.tsv"
     conda:
-        "envs/qiime2-2019-1.yaml"
+        "envs/q2_2019_1.yaml"
     shell:
         "qiime taxa filter-table "
         "--i-table {input.seqs} "
@@ -1059,7 +1058,7 @@ rule remove_non_bacterial_taxa_feature_table_pt2:
     benchmark:
         "results/run_times/remove_non_bacterial_taxa_feature_table_pt2/{ref}.tsv"
     conda:
-        "envs/qiime2-2019-1.yaml"
+        "envs/q2_2019_1.yaml"
     shell:
         "qiime taxa filter-table "
         "--i-table {input.features} "
@@ -1084,7 +1083,7 @@ rule remove_non_bacterial_taxa_sequence_table:
     benchmark:
         "results/run_times/remove_non_bacterial_taxa_sequence_table/{ref}.tsv"
     conda:
-        "envs/qiime2-2019-1.yaml"
+        "envs/q2_2019_1.yaml"
     shell:
         "qiime feature-table filter-seqs "
         "--i-data {input.seqs} "
@@ -1101,7 +1100,7 @@ rule bacteria_only_table_visualization:
         features="results/bacteria_only/feature_tables/{ref}/merged.qzv",
         seqs="results/bacteria_only/sequence_tables/{ref}/merged.qzv",
     conda:
-        "envs/qiime2-2019-1.yaml"
+        "envs/q2_2019_1.yaml"
     shell:
         "qiime feature-table summarize "
         "--i-table {input.features} "
@@ -1133,7 +1132,7 @@ rule phylogenetic_tree:
     benchmark:
         "results/run_times/phylogenetic_tree/phylogenetic_tree.tsv"
     conda:
-        "envs/qiime2-2019-1.yaml"
+        "envs/q2_2019_1.yaml"
     shell:
         "qiime phylogeny align-to-tree-mafft-fasttree "
         "--i-sequences {input} "
@@ -1197,7 +1196,7 @@ rule alpha_beta_diversity:
     benchmark:
         "results/run_times/alpha_beta_diversity/alpha_beta_diversity_{ref}.tsv"
     conda:
-        "envs/qiime2-2019-1.yaml"
+        "envs/q2_2019_1.yaml"
     shell:
         "qiime diversity core-metrics-phylogenetic "
         "--i-phylogeny {input.rooted_tree} "
@@ -1238,7 +1237,7 @@ rule alpha_diversity_visualization:
     benchmark:
         "results/run_times/alpha_diversity_visualization/alpha_diversity_visualization_{ref}.tsv"
     conda:
-        "envs/qiime2-2019-1.yaml"
+        "envs/q2_2019_1.yaml"
     shell:
         "qiime metadata tabulate "
         "--m-input-file {input.obs} "
@@ -1270,7 +1269,7 @@ rule alpha_rarefaction:
     benchmark:
         "results/run_times/alpha_rarefaction/alpha_rarefaction_{ref}.tsv"
     conda:
-        "envs/qiime2-2019-1.yaml"
+        "envs/q2_2019_1.yaml"
     shell:
         "qiime diversity alpha-rarefaction "
         "--i-table {input.features} "
@@ -1294,7 +1293,7 @@ rule convert_feature_table_to_biom:
         out1="results/denoising/feature_tables/",
         out2="results/denoising/sequence_tables/",
     conda:
-        "envs/qiime2-2019-1.yaml"
+        "envs/q2_2019_1.yaml"
     shell:
         "qiime tools export --input-path {input.table_dada2_qza} --output-path {params.out1}; "
         "biom convert -i {output.table_dada2_biom} -o {output.table_dada2_biom_tsv} --to-tsv; "
@@ -1317,7 +1316,7 @@ rule convert_bacteria_only_feature_table_to_biom:
         out1="results/bacteria_only/feature_tables/{ref}/",
         out2="results/bacteria_only/sequence_tables/{ref}/",
     conda:
-        "envs/qiime2-2019-1.yaml"
+        "envs/q2_2019_1.yaml"
     shell:
         "qiime tools export --input-path {input.table_dada2_qza} --output-path {params.out1}; "
         "biom convert -i {output.table_dada2_biom} -o {output.table_dada2_biom_tsv} --to-tsv; "
