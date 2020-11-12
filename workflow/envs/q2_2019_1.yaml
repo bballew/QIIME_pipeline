@@ -1,5 +1,6 @@
 channels:
 - qiime2/label/r2019.1
+- conda-forge/label/cf201901
 - conda-forge
 - bioconda
 - defaults
