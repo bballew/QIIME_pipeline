@@ -1,4 +1,4 @@
-name: {{ cookiecutter.repo_name }}
+name: QIIME_pipeline
 channels:
   - bioconda
   - conda-forge
