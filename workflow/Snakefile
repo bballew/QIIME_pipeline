@@ -203,18 +203,12 @@ def get_external_runID(wildcards):
     return runID
 
 
-refDict = {}
-for i in REF_DB:
-    refFile = os.path.basename(i)
-    refNoExt = os.path.splitext(refFile)[0]
-    refDict[refNoExt] = i
-
-
-def get_ref_full_path(wildcards):
-    """
-    """
-    (refFullPath) = refDict[wildcards.ref]
-    return refFullPath
+refDict = {
+    "gg-13-8-99-515-806-nb-classifier": "3afcc86150423263b3a7d983789ad0a3",
+    "silva-132-99-515-806-nb-classifier": "9f50514214ffb6fee9d2f87a47a51076",
+    "gg-13-8-99-nb-classifier": "581f97e4294cce93102b00ffaf8a1d9a",
+    "silva-132-99-nb-classifier": "a4d0da77c39da87ee1affa06b61d1224",
+}
 
 
 rule all:
@@ -224,31 +218,51 @@ rule all:
         expand("results/import_and_demultiplex/{runID}.qzv", runID=RUN_IDS),
         "results/denoising/feature_tables/merged.qzv",
         "results/denoising/sequence_tables/merged.qzv",
-        expand(
-            "results/diversity_core_metrics/{ref}/alpha_diversity_metadata.qzv", ref=refDict.keys()
-        ),
-        expand("results/diversity_core_metrics/{ref}/rarefaction.qzv", ref=refDict.keys()),
-        expand("results/taxonomic_classification/{ref}/taxa.qzv", ref=refDict.keys()),
+        expand("results/diversity_core_metrics/{ref}/alpha_diversity_metadata.qzv", ref=REF_DB),
+        expand("results/diversity_core_metrics/{ref}/rarefaction.qzv", ref=REF_DB),
+        expand("results/taxonomic_classification/{ref}/taxa.qzv", ref=REF_DB),
         expand("results/denoising/stats/{runID}.qzv", runID=RUN_IDS),
         "results/denoising/feature_tables/feature-table.from_biom.txt",
         expand(
-            "results/bacteria_only/feature_tables/{ref}/feature-table.from_biom.txt",
-            ref=refDict.keys(),
+            "results/bacteria_only/feature_tables/{ref}/feature-table.from_biom.txt", ref=REF_DB,
         ),
         "results/read_feature_and_sample_filtering/feature_tables/1_remove_samples_with_low_read_count.qzv",
         "results/read_feature_and_sample_filtering/sequence_tables/1_remove_samples_with_low_read_count.qzv",
         expand(
-            "results/taxonomic_classification/{ref}/barplots_data_files/level-7.csv",
-            ref=refDict.keys(),
+            "results/taxonomic_classification/{ref}/barplots_data_files/level-7.csv", ref=REF_DB,
         ),
         expand(
             "results/taxonomic_classification_bacteria_only/{ref}/barplots_data_files/level-7.csv",
-            ref=refDict.keys(),
+            ref=REF_DB,
         ),
-        expand("results/bacteria_only/feature_tables/{ref}/merged.qzv", ref=refDict.keys()), #,
+        expand("results/bacteria_only/feature_tables/{ref}/merged.qzv", ref=REF_DB),
 
 
 # TODO: think about adding check for minimum reads count per sample per flow cell (need more than 1 sample per flow cell passing min threshold for tab/rep seq creation) - either see if we can include via LIMS in the manifest, or use samtools(?)
+
+
+rule get_md5sums:
+    output:
+        "resources/scikit_0.20.2_q2_2019.1/md5sums.txt",
+    benchmark:
+        "results/run_times/get_md5sums.tsv"
+    run:
+        with open(str(output), "w") as f:
+            for i in REF_DB:
+                f.write(refDict[i] + "  " + i + "\n")
+
+
+rule download_reference_db:
+    input:
+        md5="resources/scikit_0.20.2_q2_2019.1/md5sums.txt",
+    output:
+        ref="resources/scikit_0.20.2_q2_2019.1/{ref}.qza",
+    benchmark:
+        "results/run_times/download_reference_db_{ref}.tsv"
+    shell:
+        "wget -O {output.ref} https://data.qiime2.org/2019.1/common/{ref}.qza && "
+        "cd resources/scikit_0.20.2_q2_2019.1/ && "
+        "md5sum -c {input.md5}"
 
 
 rule check_manifest:
@@ -830,7 +844,7 @@ rule taxonomic_classification:
     """
     input:
         seqs="results/read_feature_and_sample_filtering/sequence_tables/4_remove_samples_with_low_feature_count.qza",
-        ref=get_ref_full_path,
+        ref="resources/scikit_0.20.2_q2_2019.1/{ref}.qza",
     output:
         temp("results/taxonomic_classification/{ref}/orig.qza"),
     params:
@@ -872,7 +886,7 @@ rule bacterial_taxonomic_classification:
     """
     input:
         seqs="results/bacteria_only/sequence_tables/{ref}/merged.qza",
-        ref=get_ref_full_path,
+        ref="resources/scikit_0.20.2_q2_2019.1/{ref}.qza",
     output:
         temp("results/taxonomic_classification_bacteria_only/{ref}/orig.qza"),
     params:

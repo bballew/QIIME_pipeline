@@ -32,9 +32,11 @@ min_num_reads_per_feature: 1
 min_num_samples_per_feature: 1
 sampling_depth: 10000
 max_depth: 54000
-reference_db:  # change based on qiime version
-- '/DCEG/CGF/Bioinformatics/Production/Bari/refDatabases/scikit_0.20.2_q2_2019.1/gg-13-8-99-nb-classifier.qza'
-- '/DCEG/CGF/Bioinformatics/Production/Bari/refDatabases/scikit_0.20.2_q2_2019.1/silva-132-99-nb-classifier.qza'
+reference_db:
+- 'gg-13-8-99-515-806-nb-classifier'
+- 'silva-132-99-515-806-nb-classifier'
+# - 'gg-13-8-99-nb-classifier'
+# - 'silva-132-99-nb-classifier'
 
 ## Cluster submission parameters
 cluster_mode: 'qsub -V -q seq-calling.q -cwd -j y -o results/logs/ -S /bin/bash -pe by_node {threads}'  # options are 'qsub/sbatch/etc ...', 'local', 'dryrun', 'unlock'
