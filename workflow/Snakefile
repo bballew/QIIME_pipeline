@@ -260,7 +260,7 @@ rule download_reference_db:
     benchmark:
         "results/run_times/download_reference_db_{ref}.tsv"
     shell:
-        "wget -O {output.ref} https://data.qiime2.org/2019.1/common/{ref}.qza && "
+        "wget -O {output.ref} https://data.qiime2.org/2019.1/common/{wildcards.ref}.qza && "
         "cd resources/scikit_0.20.2_q2_2019.1/ && "
         "md5sum -c {input.md5}"
 
