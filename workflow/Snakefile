@@ -243,26 +243,29 @@ rule all:
 
 rule get_md5sums:
     output:
-        "resources/scikit_0.20.2_q2_2019.1/md5sums.txt",
+        "resources/scikit_0.20.2_q2_2019.1/md5sum_{ref}.txt",
     benchmark:
-        "results/run_times/get_md5sums.tsv"
+        "results/run_times/get_md5sums_{ref}.tsv"
     run:
         with open(str(output), "w") as f:
-            for i in REF_DB:
-                f.write(refDict[i] + "  " + i + "\n")
+            f.write(
+                refDict[wildcards.ref]
+                + "  resources/scikit_0.20.2_q2_2019.1/"
+                + wildcards.ref
+                + ".qza\n"
+            )
 
 
 rule download_reference_db:
     input:
-        md5="resources/scikit_0.20.2_q2_2019.1/md5sums.txt",
+        md5="resources/scikit_0.20.2_q2_2019.1/md5sum_{ref}.txt",
     output:
         ref="resources/scikit_0.20.2_q2_2019.1/{ref}.qza",
     benchmark:
         "results/run_times/download_reference_db_{ref}.tsv"
     shell:
         "wget -O {output.ref} https://data.qiime2.org/2019.1/common/{wildcards.ref}.qza && "
-        "cd resources/scikit_0.20.2_q2_2019.1/ && "
-        "md5sum -c {input.md5}"
+        "md5sum -c {input}"
 
 
 rule check_manifest:
