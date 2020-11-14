@@ -3,6 +3,7 @@ tests/out_*
 report/.ipynb_checkpoints/
 results/
 Q2_wrapper.sh.o*
+slurm-*.out
 resources/
 
 .snakemake
