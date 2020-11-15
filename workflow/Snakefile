@@ -305,8 +305,9 @@ rule create_symlinks:
     benchmark:
         "results/run_times/create_symlinks/{sample}.tsv"
     shell:
-        "ln -s {input.fq1} {output.sym1};"
-        "ln -s {input.fq2} {output.sym2}"
+        "ln -s {input.fq1} {output.sym1} && "
+        "ln -s {input.fq2} {output.sym2} && "
+        "touch -h {output}"
 
 
 if not cgr_data:
@@ -329,7 +330,7 @@ if not cgr_data:
             'if [[ $(zcat {input} | head -n1 | cut -f1 -d":") =~ " " ]]; then '
             '    zcat {input} | awk \'{{if (NR % 4 == 1) {{n=split($0, arr, " "); split(arr[2],tag,":"); printf "@%s ", arr[2]; for (i=3; i<=n; i++) printf "%s ",arr[i]; printf "orig_header=@%s %s\\n",substr(arr[1],2,length(arr[1])-1),tag[1]}} else {{print $0}}}}\' | gzip -c > {output}; '
             "else "
-            "    ln -s {input} {output}; "
+            "    ln -s $(pwd)/{input} {output} && touch {output}; "
             "fi"
 
     rule fix_qiita_fastq_header_r2:
@@ -350,7 +351,7 @@ if not cgr_data:
             'if [[ $(zcat {input} | head -n1 | cut -f1 -d":") =~ " " ]]; then '
             '    zcat {input} | awk \'{{if (NR % 4 == 1) {{n=split($0, arr, " "); split(arr[2],tag,":"); printf "@%s ", arr[2]; for (i=3; i<=n; i++) printf "%s ",arr[i]; printf "orig_header=@%s %s\\n",substr(arr[1],2,length(arr[1])-1),tag[1]}} else {{print $0}}}}\' | gzip -c > {output}; '
             "else "
-            "    ln -s {input} {output}; "
+            "    ln -s $(pwd)/{input} {output} && touch {output}; "
             "fi"
 
     rule fix_unpaired_reads:
